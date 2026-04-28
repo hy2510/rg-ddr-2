@@ -1,0 +1,91 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "react",
+    "react-hooks",
+    "simple-import-sort"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "prettier"
+  ],
+  "rules": {
+    /* React */
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
+    "react/jsx-key": "off",
+    "react/no-unescaped-entities": "off",
+    /* Prettier */
+    "prettier/prettier": "off",
+    /* TypeScript */
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-empty-interface": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-require-imports": "off",
+    /* Hooks */
+    "react-hooks/exhaustive-deps": "off",
+    "react-hooks/rules-of-hooks": "off",
+    "react-hooks/purity": "off",
+    "react-hooks/set-state-in-effect": "off",
+    /* Base JS */
+    "no-unused-vars": "off",
+    "no-useless-escape": "off",
+    "no-console": "off",
+    "no-debugger": "off",
+    "no-empty": "off",
+    "no-case-declarations": "off",
+    /* Import order — 통상적 그룹: side effect → node: → 패키지 → 절대/별칭 → 상대 */
+    "simple-import-sort/imports": [
+      "error",
+      {
+        "groups": [
+          ["^\\u0000"],
+          ["^node:"],
+          ["^react$", "^react-dom$", "^react/"],
+          ["^@?\\w"],
+          [
+            "^@/",
+            "^@assets/",
+            "^@components/",
+            "^@configs/",
+            "^@constants/",
+            "^@contexts/",
+            "^@hooks/",
+            "^@interfaces/",
+            "^@pages/",
+            "^@services/",
+            "^@src/",
+            "^@stylesheets/",
+            "^@utils/"
+          ],
+          ["^\\."]
+        ]
+      }
+    ],
+    "simple-import-sort/exports": "error"
+  }
+}

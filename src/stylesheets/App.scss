@@ -1,0 +1,43 @@
+input:focus {
+  outline: none;
+}
+
+* {
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  font-size: 18px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #1a1a1a;
+  @media screen and (max-width: 375px) {
+    font-size: 15px;
+  }
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+button,
+a,
+img,
+div {
+  -webkit-tap-highlight-color: transparent;
+  tap-highlight-color: transparent;
+}
+
+svg {
+  will-change: transform, opacity;
+}
