@@ -32,7 +32,15 @@ import {
   getReviewVideo,
   postLevelUpdate,
 } from '@services/api'
-import { iconIntroMyMovie, iconIntroPlay, iconIntroRecord } from '@utils/Assets'
+import {
+  iconIntroMyMovie,
+  iconIntroPlay,
+  iconIntroRecord,
+  iconPlayFull,
+  iconPlaySingle,
+  imgModeFull,
+  imgModeSingle,
+} from '@utils/Assets'
 import { getCookie } from '@utils/common'
 
 export type SpeakMode = 'Solo' | 'Full'
@@ -45,6 +53,7 @@ type DubbingContainerProps = {
 type ArchiveStudyIds = {
   studyId: string
   studentHistoryId: string
+  endDate: string
 }
 
 function studyToArchiveIds(
@@ -54,7 +63,11 @@ function studyToArchiveIds(
     | undefined,
 ): ArchiveStudyIds | null {
   if (!study?.StudyId?.trim() || !study?.StudentHistoryId?.trim()) return null
-  return { studyId: study.StudyId, studentHistoryId: study.StudentHistoryId }
+  return {
+    studyId: study.StudyId,
+    studentHistoryId: study.StudentHistoryId,
+    endDate: study.EndDate,
+  }
 }
 
 function toWordRatePercent(raw: unknown): number {
@@ -143,6 +156,7 @@ export default function DubbingContainer({
   const [step, setStep] = useState<DubbingStep>('watch-video-intro')
   const [isArchiveModeSelectionIntro, setIsArchiveModeSelectionIntro] =
     useState(false)
+  const [showArchiveModePicker, setShowArchiveModePicker] = useState(false)
   const [introArchiveMyMovie, setIntroArchiveMyMovie] = useState<{
     solo: ArchiveStudyIds | null
     full: ArchiveStudyIds | null
@@ -242,8 +256,7 @@ export default function DubbingContainer({
 
   const handleOpenArchiveModePicker = useCallback(() => {
     if (!introArchiveMyMovie.solo && !introArchiveMyMovie.full) return
-    setIsArchiveModeSelectionIntro(true)
-    setStep('my-movie-intro')
+    setShowArchiveModePicker(true)
   }, [introArchiveMyMovie.full, introArchiveMyMovie.solo])
 
   const handleGoToMyMovieFromWatchVideoIntro = useCallback(
@@ -284,6 +297,7 @@ export default function DubbingContainer({
       setMyMovieScoreSnapshot(null)
       setShowMyMovieScore(false)
       setIsArchiveModeSelectionIntro(false)
+      setShowArchiveModePicker(false)
       setIsMyMovieLoading(true)
       try {
         const { archiveContent, reviewVideoUrl } =
@@ -364,36 +378,95 @@ export default function DubbingContainer({
     introArchiveMyMovie.solo || introArchiveMyMovie.full,
   )
 
+  const renderArchiveModePickerPopup = () => {
+    if (!showArchiveModePicker) return null
+
+    const modeOptions = [
+      {
+        mode: 'Solo' as const,
+        label: 'Single',
+        icon: imgModeSingle,
+        study: introArchiveMyMovie.solo,
+      },
+      {
+        mode: 'Full' as const,
+        label: 'Full Cast',
+        icon: imgModeFull,
+        study: introArchiveMyMovie.full,
+      },
+    ]
+
+    return (
+      <PopupLayout
+        contents='Choose Your Movie Version'
+        confirm={false}
+        hideButtons
+        onClose={() => setShowArchiveModePicker(false)}
+      >
+        <StyledArchiveModePicker>
+          <div className='mode-list'>
+            {modeOptions.map(({ mode, label, icon, study }) => {
+              const disabled = !study
+
+              return (
+                <button
+                  key={mode}
+                  type='button'
+                  className={`mode-card ${mode.toLowerCase()}`}
+                  disabled={disabled}
+                  onClick={() => handleGoToMyMovieFromWatchVideoIntro(mode)}
+                >
+                  <img src={icon} alt='' width={132} height={92} />
+                  <span>{label}</span>
+                  {study?.endDate && <small>{study.endDate}</small>}
+                </button>
+              )
+            })}
+          </div>
+        </StyledArchiveModePicker>
+      </PopupLayout>
+    )
+  }
+
   const renderStep = () => {
     switch (step) {
       case 'watch-video-intro':
         return (
-          <IntroLayout
-            thumbnailImage={introThumbnail}
-            onClick={() => setStep('watch-video')}
-            buttonText='Watch Video'
-            buttonIcon={iconIntroPlay}
-            buttonColor='#3c4b62'
-            secondaryButton={
-              canShowIntroArchiveMyMovie
-                ? {
-                    text: 'My Movie',
-                    icon: iconIntroMyMovie,
-                    bgColor: '#3c4b62',
-                    onClick: handleOpenArchiveModePicker,
-                  }
-                : undefined
-            }
-          />
+          <>
+            <IntroLayout
+              thumbnailImage={introThumbnail}
+              onClick={() => setStep('watch-video')}
+              stepComment={
+                canShowIntroArchiveMyMovie
+                  ? 'What do you want to do?'
+                  : 'Step1 · Let’s watch first!'
+              }
+              buttonText={canShowIntroArchiveMyMovie ? 'Watch Again' : 'Watch!'}
+              buttonIcon={iconIntroPlay}
+              buttonColor='#3c4b62'
+              secondaryButton={
+                canShowIntroArchiveMyMovie
+                  ? {
+                      text: 'Watch My Movie',
+                      icon: iconIntroMyMovie,
+                      bgColor: '#3c4b62',
+                      onClick: handleOpenArchiveModePicker,
+                    }
+                  : undefined
+              }
+            />
+            {renderArchiveModePickerPopup()}
+          </>
         )
       case 'watch-video':
         return <WatchVideo handleSelectMode={handleSelectMode} />
       case 'dubbing-intro':
         return (
           <IntroLayout
+            stepComment='Step2 · Let’s dub!'
             thumbnailImage={introThumbnail}
             onClick={() => setStep('dubbing')}
-            buttonText='Start Dubbing'
+            buttonText="Let's Dub!"
             buttonIcon={iconIntroRecord}
             buttonColor='#3c4b62'
           />
@@ -411,12 +484,12 @@ export default function DubbingContainer({
             <IntroLayout
               thumbnailImage={introThumbnail}
               onClick={() => handleGoToMyMovieFromWatchVideoIntro('Solo')}
-              buttonText='솔로'
+              buttonText='Single'
               buttonIcon={iconIntroMyMovie}
               buttonColor='#f08cb4'
               buttonDisabled={!introArchiveMyMovie.solo}
               secondaryButton={{
-                text: '풀 캐스트',
+                text: 'Full Cast',
                 icon: iconIntroMyMovie,
                 bgColor: '#f4d44d',
                 onClick: () => handleGoToMyMovieFromWatchVideoIntro('Full'),
@@ -439,15 +512,22 @@ export default function DubbingContainer({
           <StyledMyMovieVideo
             $visible={Boolean(myMovieUrl) && !isMyMovieLoading}
           >
-            {myMovieScoreSnapshot && (
-              <SeeScoreBoardButton onClick={() => setShowMyMovieScore(true)} />
-            )}
             {isMyMovieLoading ? (
               <Loading />
             ) : myMovieUrl ? (
-              <MyMoviePlayer src={myMovieUrl} videoRef={myMovieVideoRef} />
+              <MyMoviePlayer
+                src={myMovieUrl}
+                videoRef={myMovieVideoRef}
+                controlsEnd={
+                  myMovieScoreSnapshot ? (
+                    <SeeScoreBoardButton
+                      onClick={() => setShowMyMovieScore(true)}
+                    />
+                  ) : null
+                }
+              />
             ) : (
-              <p className='placeholder'>My Movie 파일을 찾을 수 없어요.</p>
+              <p className='placeholder'>We couldn’t find your movie.</p>
             )}
             {showMyMovieScore && myMovieScoreSnapshot && (
               <PopupLayout
@@ -460,8 +540,8 @@ export default function DubbingContainer({
                     encodeState={{ status: 'idle' }}
                     onRetry={() => setShowMyMovieScore(false)}
                     onConfirm={() => setShowMyMovieScore(false)}
-                    retryText='닫기'
-                    confirmText='확인'
+                    retryText='Close'
+                    confirmText='Confirm'
                   />
                 }
                 onClose={() => setShowMyMovieScore(false)}
@@ -482,6 +562,7 @@ export default function DubbingContainer({
           isWatchVideo={step === 'watch-video-intro' || step === 'watch-video'}
           isDubbingIntro={step === 'dubbing-intro'}
           isOnAir={step === 'dubbing'}
+          onAirMode={step === 'dubbing' ? detailContentInfo.StudyMode : ''}
           isMyMovie={step === 'my-movie-intro' || step === 'my-movie'}
           onConfirmExit={handleHeaderConfirmExit}
         />
@@ -502,6 +583,98 @@ const StyledDubbingRoom = styled.div`
   height: ${DUBBING_ROOM_BASE_HEIGHT}px;
   margin: auto;
   position: relative;
+`
+
+const StyledArchiveModePicker = styled.div`
+  width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  color: #344259;
+  font-family: var(--sans);
+
+  h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .mode-list {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .mode-card {
+    width: 224px;
+    height: 224px;
+    border: 0;
+    border-radius: 36px;
+    background: #ffd800;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    color: #fff;
+    font-family: var(--sans);
+    font-weight: 800;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    transform: translateY(0);
+
+    &:active:not(:disabled) {
+      transform: translateY(4px);
+      box-shadow: none;
+    }
+
+    &:disabled {
+      cursor: default;
+      box-shadow: none;
+      filter: grayscale(1);
+      opacity: 0.75;
+    }
+
+    &.solo {
+      background: #fe80ce;
+      box-shadow: 0 4px 0 color-mix(in srgb, #fe80ce 60%, #000);
+    }
+
+    &.full {
+      background: #ffd800;
+      box-shadow: 0 4px 0 color-mix(in srgb, #ffd800 60%, #000);
+    }
+
+    &.solo:disabled,
+    &.full:disabled {
+      box-shadow: none;
+    }
+
+    img {
+      width: 132px;
+      height: 92px;
+      object-fit: contain;
+    }
+
+    span {
+      font-size: 3em;
+      line-height: 1;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    small {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1;
+      text-align: center;
+    }
+  }
 `
 
 const StyledMyMovieVideo = styled.div<{ $visible: boolean }>`

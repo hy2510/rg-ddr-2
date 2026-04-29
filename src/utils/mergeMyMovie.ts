@@ -100,7 +100,7 @@ export async function mergeMyMovieAndDownload(
     }
   }
 
-  report(0, '영상 준비 중')
+  report(0, 'Preparing video...')
 
   // 1. <video> 엘리먼트 준비 (원본 오디오 포함해서 로드)
   const video = document.createElement('video')
@@ -122,7 +122,7 @@ export async function mergeMyMovieAndDownload(
     }
     const onError = () => {
       cleanup()
-      reject(new Error('영상을 불러오지 못했습니다.'))
+      reject(new Error('Failed to load video.'))
     }
     video.addEventListener('loadedmetadata', onLoaded)
     video.addEventListener('error', onError)
@@ -132,7 +132,7 @@ export async function mergeMyMovieAndDownload(
   const height = video.videoHeight || 720
   const totalDuration = Number.isFinite(video.duration) ? video.duration : 0
   if (totalDuration <= 0) {
-    throw new Error('영상 길이를 확인할 수 없습니다.')
+    throw new Error('Failed to check video length.')
   }
 
   // 2. 캔버스 준비 + video 스트림
@@ -140,7 +140,7 @@ export async function mergeMyMovieAndDownload(
   canvas.width = width
   canvas.height = height
   const ctx = canvas.getContext('2d', { alpha: false })
-  if (!ctx) throw new Error('캔버스 컨텍스트를 생성할 수 없습니다.')
+  if (!ctx) throw new Error('Failed to create canvas context.')
   ctx.fillStyle = '#000'
   ctx.fillRect(0, 0, width, height)
 
@@ -180,11 +180,14 @@ export async function mergeMyMovieAndDownload(
         const arrayBuffer = await seg.audioBlob.arrayBuffer()
         buffer = await audioCtx.decodeAudioData(arrayBuffer.slice(0))
       } catch (err) {
-        console.warn('오디오 디코딩 실패 (cue=', seg.cue.start, '):', err)
+        console.warn('Audio decoding failed (cue=', seg.cue.start, '):', err)
       }
     }
     decoded.push({ cue: seg.cue, buffer })
-    report(0.05 + ((i + 1) / validSegments.length) * 0.1, '녹음 파일 준비 중')
+    report(
+      0.05 + ((i + 1) / validSegments.length) * 0.1,
+      'Preparing recording file...',
+    )
   }
 
   const combinedStream = new MediaStream([
@@ -204,7 +207,7 @@ export async function mergeMyMovieAndDownload(
   }
   const recorderDone = new Promise<void>((resolve, reject) => {
     recorder.onstop = () => resolve()
-    recorder.onerror = (e) => reject(new Error(`녹화 중 오류: ${String(e)}`))
+    recorder.onerror = (e) => reject(new Error(`Recording error: ${String(e)}`))
   })
 
   // 5. 캔버스 drawing loop
@@ -255,7 +258,7 @@ export async function mergeMyMovieAndDownload(
           // 녹음이 cue 구간보다 길면 끝에서 자른다.
           src.stop(Math.max(endCtx, audioCtx.currentTime))
         } catch (err) {
-          console.warn('audio source 재생 실패:', err)
+          console.warn('audio source play failed:', err)
         }
         activeSources.push(src)
       }
@@ -266,7 +269,7 @@ export async function mergeMyMovieAndDownload(
       if (totalDuration > 0) {
         const ratio = Math.min(1, video.currentTime / totalDuration)
         // 디코드 단계 이후부터는 0.15 → 0.95 구간으로 매핑
-        report(0.15 + ratio * 0.8, '합성 중')
+        report(0.15 + ratio * 0.8, 'Merging...')
       }
     }, 200)
 
@@ -288,7 +291,7 @@ export async function mergeMyMovieAndDownload(
       }
     })
 
-    report(0.96, '파일 생성 중')
+    report(0.96, 'Creating file...')
 
     if (recorder.state !== 'inactive') recorder.stop()
     await recorderDone
@@ -313,7 +316,7 @@ export async function mergeMyMovieAndDownload(
       // URL 은 재생 용도로도 쓰이므로 caller 가 관리한다 (여기서 revoke 하지 않음).
     }
 
-    report(1, '완료')
+    report(1, 'Completed')
     return { blob: finalBlob, url, mimeType: finalType }
   } finally {
     rafActive = false

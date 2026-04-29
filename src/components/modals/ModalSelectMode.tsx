@@ -7,7 +7,7 @@ import { useAppContext } from '@contexts/AppContext'
 import { useSoundContext } from '@contexts/SoundContext'
 import { IResultPostStudy } from '@interfaces/IDubbing'
 import { postStudyInfo } from '@services/api'
-import { iconCheckYellow, iconCloseRed } from '@utils/Assets'
+import { imgModeFull, imgModeSingle } from '@utils/Assets'
 
 type ModalSelectModeProps = {
   handleSelectMode: (res: IResultPostStudy) => void
@@ -55,103 +55,130 @@ export default function ModalSelectMode({
     }, 1000)
   }
 
-  const bookPoint = Number(contentInfo.BookPoint) || 0
-  const rgPointSum = Number(contentInfo.RgPointSum) || 0
-  const epsilon = 0.001
-  const isSoloDone = Math.abs(rgPointSum - bookPoint * 0.5) < epsilon
-  const isFullDone = Math.abs(rgPointSum - bookPoint) < epsilon
-  const isAllDone = Math.abs(rgPointSum - bookPoint * 1.5) < epsilon
-  const soloDone = isSoloDone || isAllDone
-  const fullDone = isFullDone || isAllDone
+  const modeOptions = [
+    {
+      mode: 'Solo' as const,
+      label: 'Single',
+      icon: imgModeSingle,
+      description: 'Record lines of\nthe main character!',
+    },
+    {
+      mode: 'Full' as const,
+      label: 'Full Cast',
+      icon: imgModeFull,
+      description: 'Record all lines\nby yourself!',
+    },
+  ]
 
   return (
     <PopupLayout
-      confirm
-      okText='풀 캐스트 모드'
-      cancelText='솔로 모드'
-      onOk={() => onClickSelectMode('Full')}
-      onCancel={() => onClickSelectMode('Solo')}
+      contents='Choose Dubbing Mode'
+      confirm={false}
+      hideButtons
       onClose={handleClose}
-      contents={
-        <StyledBody>
-          <p className='title'>어떤 모드로 더빙할까요?</p>
-          <ul className='hints'>
-            <li className={soloDone ? 'done' : 'pending'}>
-              {soloDone ? (
-                <img src={iconCheckYellow} alt='' width={22} height={22} />
-              ) : (
-                <img src={iconCloseRed} alt='' width={22} height={22} />
-              )}
-              솔로
-            </li>
-            <li className={fullDone ? 'done' : 'pending'}>
-              {fullDone ? (
-                <img src={iconCheckYellow} alt='' width={22} height={22} />
-              ) : (
-                <img src={iconCloseRed} alt='' width={22} height={22} />
-              )}
-              풀 캐스트
-            </li>
-          </ul>
-          {pressedMode != null && (
-            <p className='pending' aria-live='polite'>
-              {pressedMode === 'Solo' ? '솔로 모드' : '풀 캐스트 모드'} 적용 중…
-            </p>
-          )}
-        </StyledBody>
-      }
-    />
+    >
+      <StyledSelectModeContainer>
+        <div className='mode-list'>
+          {modeOptions.map(({ mode, label, icon, description }) => (
+            <button
+              key={mode}
+              type='button'
+              className={`mode-card ${mode.toLowerCase()}`}
+              disabled={pressedMode != null}
+              onClick={() => onClickSelectMode(mode)}
+            >
+              <img src={icon} alt='' width={132} height={92} />
+              <span>{label}</span>
+              <small>{description}</small>
+            </button>
+          ))}
+        </div>
+      </StyledSelectModeContainer>
+    </PopupLayout>
   )
 }
 
-const StyledBody = styled.div`
-  position: relative;
-  width: 100%;
-  max-width: 520px;
+const StyledSelectModeContainer = styled.div`
+  width: 520px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 20px;
-  padding: 8px 12px 0;
-  color: #3c4b62;
+  gap: 32px;
+  color: #344259;
+  font-family: var(--sans);
 
-  .title {
-    margin: 0;
-    text-align: center;
-    font-size: 1.35em;
-    font-weight: 700;
-    line-height: 1.35;
-  }
-
-  .hints {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  .mode-list {
     display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
     justify-content: center;
-    font-size: 0.95em;
-    font-weight: 600;
-    color: #5a6780;
-
-    li {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    li.pending {
-      opacity: 0.7;
-    }
-
+    gap: 16px;
+    width: 100%;
   }
 
-  .pending {
-    margin: 0;
-    font-size: 0.95em;
-    font-weight: 600;
-    color: #1750da;
+  .mode-card {
+    width: 224px;
+    height: 224px;
+    border: 0;
+    border-radius: 36px;
+    background: #ffd800;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    color: #fff;
+    font-family: var(--sans);
+    font-weight: 800;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    transform: translateY(0);
+
+    &:active:not(:disabled) {
+      transform: translateY(4px);
+      box-shadow: none;
+    }
+
+    &:disabled {
+      cursor: default;
+      box-shadow: none;
+      filter: grayscale(1);
+      opacity: 0.75;
+    }
+
+    &.solo {
+      background: #fe80ce;
+      box-shadow: 0 4px 0 color-mix(in srgb, #fe80ce 60%, #000);
+    }
+
+    &.full {
+      background: #ffd800;
+      box-shadow: 0 4px 0 color-mix(in srgb, #ffd800 60%, #000);
+    }
+
+    &.solo:disabled,
+    &.full:disabled {
+      box-shadow: none;
+    }
+
+    img {
+      width: 132px;
+      height: 92px;
+      object-fit: contain;
+    }
+
+    span {
+      font-size: 3em;
+      line-height: 1;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    small {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.1;
+      text-align: center;
+      white-space: pre-line;
+    }
   }
 `

@@ -1,6 +1,7 @@
 import styled, { keyframes } from 'styled-components'
 
 import { RectangleButton } from '@components/common/Buttons'
+import { glossyBg } from '@utils/Assets'
 
 type IntroLayoutProps = {
   thumbnailImage: string
@@ -16,6 +17,7 @@ type IntroLayoutProps = {
     bgColor?: string
     disabled?: boolean
   }
+  stepComment?: string
 }
 
 export function IntroLayout({
@@ -26,10 +28,12 @@ export function IntroLayout({
   buttonColor,
   buttonDisabled,
   secondaryButton,
+  stepComment = 'Step1 · Let’s watch first!',
 }: IntroLayoutProps) {
   return (
     <StyledIntroLayout>
       <StyledIntroContent>
+        <div className='intro-step-comment'>{stepComment}</div>
         <img src={thumbnailImage} alt='intro' className='intro-thumbnail' />
         <div className='intro-button-row'>
           <RectangleButton
@@ -80,6 +84,11 @@ const StyledIntroContent = styled.div`
   right: 0;
   bottom: 0;
   color: #fff;
+  background-color: rgba(0, 0, 0, 0.25);
+  background-image: url(${glossyBg});
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   -webkit-backdrop-filter: blur(30px);
   backdrop-filter: blur(30px);
   display: flex;
@@ -89,9 +98,16 @@ const StyledIntroContent = styled.div`
   gap: 20px;
   z-index: 2;
 
+  .intro-step-comment {
+    font-size: 2em;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
   .intro-thumbnail {
     display: block;
-    width: 600px;
+    width: 500px;
     height: auto;
     object-fit: cover;
     border: 4px solid #fff;
@@ -106,6 +122,7 @@ const StyledIntroContent = styled.div`
 
   .intro-button-row {
     display: flex;
+    flex-direction: column;
     gap: 16px;
     align-items: center;
     justify-content: center;

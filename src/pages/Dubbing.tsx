@@ -575,7 +575,7 @@ export default function Dubbing({
       setEncodeState({
         status: 'downloading',
         progress: 0,
-        message: '영상 준비 중',
+        message: 'Preparing video...',
       })
       try {
         const segments: MergeCueSegment[] = captionTimeline.map((cue) => ({
@@ -606,7 +606,7 @@ export default function Dubbing({
           message:
             error instanceof Error
               ? error.message
-              : 'My Movie 생성에 실패했어요. 다시 시도해 주세요.',
+              : 'Failed to create My Movie. Please try again.',
         })
       }
       return
@@ -648,10 +648,10 @@ export default function Dubbing({
         <DubbingCaptionLayout
           caption={caption}
           characterImage={characterImage}
-            onReplayCue={handleReplayCue}
+          onReplayCue={handleReplayCue}
           onStartRecording={handleStartRecordingWithCountdown}
           onPlayRecording={() => playRecording()}
-            onNext={handleNextCue}
+          onNext={handleNextCue}
           onFinishDubbing={onClickSave}
           isNextDisabled={isNextCueDisabled || !canGoNext}
           isMicDisabled={
@@ -688,8 +688,8 @@ export default function Dubbing({
                 setShowModalTotalScore(false)
               }}
               onConfirm={handleConfirmScorePopup}
-              retryText={outputFile ? '리스트로' : '다시하기'}
-              confirmText={outputFile ? 'My Movie 보기' : '확인'}
+              retryText={outputFile ? 'Back to List' : 'Retry'}
+              confirmText={outputFile ? 'Watch My Movie' : 'Confirm'}
             />
           }
         />
@@ -699,9 +699,9 @@ export default function Dubbing({
 
       {showMicUnavailable && (
         <PopupLayout
-          contents='마이크를 사용할 수 없어요. 기기 설정을 확인해 주세요.'
+          contents='Microphone is not available. Please check your device settings.'
           confirm={false}
-          confirmText='확인'
+          confirmText='Confirm'
           onConfirm={() => setShowMicUnavailable(false)}
           onClose={() => setShowMicUnavailable(false)}
         />

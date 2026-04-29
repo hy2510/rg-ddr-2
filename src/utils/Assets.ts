@@ -30,9 +30,12 @@ import imgBtnTabLevelC from '@assets/images/common/btn-tab-level_c.png'
 import imgBtnTabLevelCOn from '@assets/images/common/btn-tab-level_c_on.png'
 import iconPointMark from '@assets/images/common/ico-point_mark.png'
 import imgArrowDown from '@assets/images/common/img_arrow_down.png'
+import glossyBg from '@assets/images/common/img_glossy_bg.png'
 import resContentsListHeaderLine from '@assets/images/common/res-contents_list_header_line.png'
 import imgBtnChevLeft from '@assets/images/dubbing/btn-chev_left.svg'
 import imgBtnChevRight from '@assets/images/dubbing/btn-chev_right.svg'
+import imgModeFull from '@assets/images/dubbing/img_dubbing_mode_full.png'
+import imgModeSingle from '@assets/images/dubbing/img_dubbing_mode_single.png'
 import bgFilter from '@assets/images/home/bg_filter.png'
 import imgBtnHomeExit from '@assets/images/home/btn-exit.svg'
 import imgBtnNoMute from '@assets/images/home/btn-mute_n.svg'
@@ -61,6 +64,7 @@ export {
   // Backgrounds & list chrome
   bgCoinEmpty,
   bgFilter,
+  glossyBg,
   glossyLine,
   iconArrowLeft,
   iconArrowRight,
@@ -106,6 +110,8 @@ export {
   imgBtnTabLevelCOn,
   imgBtnVolumeOff,
   imgBtnVolumeOn,
+  imgModeFull,
+  imgModeSingle,
   imgStarLevelKA,
   imgStarLevelKB,
   imgStarLevelKC,

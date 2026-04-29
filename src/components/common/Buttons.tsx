@@ -4,7 +4,7 @@ import {
   glossyVideoCenterIconStyles,
   VideoPlayIcon,
 } from '@components/common/Icons'
-import { iconFile, iconMic, iconRotate } from '@utils/Assets'
+import { iconArrowRight, iconFile, iconMic, iconRotate } from '@utils/Assets'
 
 const videoCenterIconStyles = glossyVideoCenterIconStyles
 
@@ -95,6 +95,7 @@ type RectangleButtonProps = {
   bgColor?: string
   text?: string
   disabled?: boolean
+  size?: 'free' | 'large'
 }
 
 export function RectangleButton({
@@ -103,6 +104,7 @@ export function RectangleButton({
   bgColor,
   text,
   disabled,
+  size = 'large',
 }: RectangleButtonProps) {
   const handleClick = () => {
     if (disabled) return
@@ -113,20 +115,30 @@ export function RectangleButton({
       onClick={handleClick}
       $bgColor={bgColor ?? '#2d2d2d'}
       $disabled={disabled}
+      $size={size}
     >
-      {icon && <img src={icon} alt='icon' className='icon' />}
-      {text && <span className='text'>{text}</span>}
+      <div className='button-content'>
+        {icon && <img src={icon} alt='icon' className='icon' />}
+        {text && <span className='text'>{text}</span>}
+      </div>
+      <img src={iconArrowRight} alt='arrow right' width={32} height={32} />
     </StyledRectangleButton>
   )
 }
 
-const StyledRectangleButton = styled.div<{ $bgColor: string; $disabled?: boolean }>`
+const StyledRectangleButton = styled.div<{
+  $bgColor: string
+  $disabled?: boolean
+  $size?: 'free' | 'large'
+}>`
+  width: ${({ $size }) => ($size === 'large' ? '380px' : 'auto')};
   cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: ${({ $size }) =>
+    $size === 'large' ? 'space-between' : 'center'};
   gap: 10px;
-  padding: 20px 40px;
+  padding: 20px 30px;
   border-radius: 25px;
   background-color: ${({ $bgColor }) => $bgColor ?? '#2d2d2d'};
   box-shadow: ${({ $bgColor }) => {
@@ -141,18 +153,25 @@ const StyledRectangleButton = styled.div<{ $bgColor: string; $disabled?: boolean
   transform: translateY(0);
 
   &:active {
-    transform: ${({ $disabled }) => ($disabled ? 'translateY(0)' : 'translateY(4px)')};
+    transform: ${({ $disabled }) =>
+      $disabled ? 'translateY(0)' : 'translateY(4px)'};
     box-shadow: ${({ $disabled }) => ($disabled ? undefined : 'none')};
   }
 
-  .icon {
-    width: 2em;
-    height: 2em;
-  }
+  .button-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
 
-  .text {
-    font-size: 2em;
-    font-weight: 600;
+    .icon {
+      width: 2em;
+      height: 2em;
+    }
+
+    .text {
+      font-size: 2em;
+      font-weight: 600;
+    }
   }
 `
 
@@ -255,15 +274,16 @@ export function SeeScoreBoardButton({ onClick }: { onClick?: () => void }) {
 
 const StyledSeeScoreBoardButton = styled.div`
   cursor: pointer;
+  flex-shrink: 0;
   width: 60px;
   height: 60px;
-  position: absolute;
-  right: 33px;
-  top: 110px;
-  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 20px;
+  background-color: rgba(0, 0, 0, 0.15);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 
   img {
     display: block;

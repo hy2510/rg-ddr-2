@@ -4,14 +4,18 @@ import { type CaptionCue } from '@components/dubbing/caption/captionTimeline'
 
 // 정규화 후 동일하거나(거의 일치) 한 글자 정도의 작은 차이만 허용한다.
 // 음성 인식 결과가 큐 단어를 실제로 "인식" 한 경우에만 하이라이트되도록
-// 0.5 의 높은 유사도 임계치를 사용한다.
-const MATCH_THRESHOLD = 0.5
+const MATCH_THRESHOLD = 0.25
 
 // 예외 단어 목록.
 // 여기에 등록된 단어는 사용자가 "어떤 소리든" 내면 정답으로 처리한다.
 // (예: 감탄사처럼 음성 인식기가 철자를 맞추기 어려운 경우)
 // 추가 시 정규화된 형태(소문자 알파벳/숫자만)로 등록한다.
-const EXCEPTION_WORDS: ReadonlySet<string> = new Set<string>(['Leoni', 'oho'])
+const EXCEPTION_WORDS: ReadonlySet<string> = new Set<string>([
+  'leoni',
+  'oho',
+  'woohoo',
+  'ahhh',
+])
 
 function isExceptionCueWord(word: string): boolean {
   return EXCEPTION_WORDS.has(normalizeWord(word))

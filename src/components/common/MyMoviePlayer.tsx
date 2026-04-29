@@ -1,4 +1,5 @@
 import {
+  type ReactNode,
   type Ref,
   type RefObject,
   useCallback,
@@ -17,6 +18,7 @@ import { PauseBarsIcon } from '@components/common/MyMoviePlayerIcons'
 type MyMoviePlayerProps = {
   src: string
   videoRef: RefObject<HTMLVideoElement | null>
+  controlsEnd?: ReactNode
 }
 
 function formatClock(sec: number) {
@@ -26,7 +28,11 @@ function formatClock(sec: number) {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
-export function MyMoviePlayer({ src, videoRef }: MyMoviePlayerProps) {
+export function MyMoviePlayer({
+  src,
+  videoRef,
+  controlsEnd,
+}: MyMoviePlayerProps) {
   const [duration, setDuration] = useState(0)
   const [currentTime, setCurrentTime] = useState(0)
   const [paused, setPaused] = useState(true)
@@ -160,6 +166,7 @@ export function MyMoviePlayer({ src, videoRef }: MyMoviePlayerProps) {
         <TimeText aria-hidden>
           {formatClock(currentTime)} / {formatClock(duration)}
         </TimeText>
+        {controlsEnd}
       </Controls>
     </Shell>
   )
@@ -237,15 +244,15 @@ const IconButton = styled.button`
   width: 60px;
   height: 60px;
   border: none;
-  border-radius: 15px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.15);
   transition: background 0.15s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.22);
+    background: rgba(0, 0, 0, 0.25);
   }
 `
 

@@ -12,6 +12,7 @@ type HeaderProps = {
   /** `dubbing-intro` — 녹음 시작 전 안내 화면 */
   isDubbingIntro?: boolean
   isOnAir?: boolean
+  onAirMode?: string
   isMyMovie?: boolean
   /** X 클릭 시 부모의 다른 팝업(go-dubbing 등)을 먼저 닫을 때 */
   onDismissSiblingPopups?: () => void
@@ -24,6 +25,7 @@ export function HeaderLayout({
   isWatchVideo,
   isDubbingIntro,
   isOnAir,
+  onAirMode,
   isMyMovie,
   onDismissSiblingPopups,
   onConfirmExit,
@@ -42,40 +44,32 @@ export function HeaderLayout({
     onConfirmExit()
   }
 
+  const onAirModeLabel =
+    onAirMode?.trim().toLowerCase() === 'full' ? 'Full Cast' : 'Single'
+
   return (
     <>
       <StyledHeader>
         <div className='title-container'>
-          {isMyMovie && (
-            <>
-              <div className='title'>My Movie · {studyTitle}</div>
-            </>
-          )}
+          {isMyMovie && <></>}
           {isOnAir && (
             <>
               <div className='on-air-icon' />
-              <div className='title'>On Air · {studyTitle}</div>
+              <div className='title'>On Air</div>
+              {onAirMode && <div className='mode-label'>{onAirModeLabel}</div>}
             </>
           )}
-          {isDubbingIntro && (
-            <>
-              <div className='title'>Dubbing · {studyTitle}</div>
-            </>
-          )}
-          {isWatchVideo && (
-            <>
-              <div className='title'>Watch Video · {studyTitle}</div>
-            </>
-          )}
+          {isDubbingIntro && <></>}
+          {isWatchVideo && <></>}
         </div>
         <SquareButton icon={iconDelete} onClick={handleCloseClick} />
       </StyledHeader>
       {exitConfirmOpen && (
         <PopupLayout
-          contents='목록으로 돌아가시겠습니까?'
+          contents='Go back to the list?'
           confirm={true}
-          okText='예'
-          cancelText='아니오'
+          okText='Yes'
+          cancelText='No'
           onOk={handleConfirmExit}
           onCancel={handleDismissExit}
           onClose={handleDismissExit}
@@ -123,11 +117,25 @@ const StyledHeader = styled.div`
     }
 
     .title {
-      width: 100%;
       font-size: 1.5em;
       font-weight: 600;
       color: #fff;
       text-align: left;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+    }
+
+    .mode-label {
+      min-width: 76px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background-color: rgba(255, 255, 255, 0.22);
+      color: #fff;
+      font-size: 1.15em;
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.32);
     }
   }
 `

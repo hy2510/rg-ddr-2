@@ -15,6 +15,7 @@ type PopupLayoutProps = {
   okText?: string
   cancelText?: string
   confirmText?: string
+  children?: ReactNode
 }
 
 export default function PopupLayout({
@@ -28,33 +29,35 @@ export default function PopupLayout({
   okText = 'OK',
   cancelText = 'No',
   confirmText = 'Confirm',
+  children,
 }: PopupLayoutProps) {
   return (
     <StyledPopupLayout>
-      <div className="popup-container">
-        <div className="contents">{contents}</div>
+      <div className='popup-container'>
+        <div className='contents'>{contents}</div>
         {!hideButtons && (
-          <div className="buttons">
+          <div className='buttons'>
             {confirm ? (
               <>
                 <PopupButton
                   onClick={onCancel}
                   text={cancelText}
-                  buttonColor="gray"
+                  buttonColor='gray'
                 />
-                <PopupButton onClick={onOk} text={okText} buttonColor="green" />
+                <PopupButton onClick={onOk} text={okText} buttonColor='green' />
               </>
             ) : (
               <PopupButton
                 onClick={onConfirm}
                 text={confirmText}
-                buttonColor="green"
+                buttonColor='green'
               />
             )}
           </div>
         )}
+        {hideButtons && children}
       </div>
-      <div className="back-space" onClick={onClose} />
+      <div className='back-space' onClick={onClose} />
     </StyledPopupLayout>
   )
 }

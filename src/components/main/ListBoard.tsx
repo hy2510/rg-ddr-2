@@ -14,6 +14,9 @@ export const StyledListBoard = styled.div`
   .thumbnail {
     cursor: pointer;
     position: relative;
+    min-height: 232px;
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 12px;
 
     &:active {
       transform: scale(0.98);

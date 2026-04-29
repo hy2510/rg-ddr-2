@@ -22,8 +22,8 @@ export function TotalScore({
   encodeState,
   onRetry,
   onConfirm,
-  confirmText = '확인',
-  retryText = '다시하기',
+  confirmText = 'Confirm',
+  retryText = 'Retry',
 }: TotalScoreProps) {
   const totals = captionTimeline.reduce(
     (acc, cue) => {
@@ -84,7 +84,7 @@ export function TotalScore({
 
       {encodeState.status === 'downloading' && (
         <span className='download-status'>
-          {(encodeState.message ?? 'My Movie 준비 중…') +
+          {(encodeState.message ?? 'Preparing My Movie …') +
             ` ${Math.round(encodeState.progress * 100)}%`}
         </span>
       )}
